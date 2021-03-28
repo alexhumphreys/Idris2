@@ -27,6 +27,9 @@ runTests = do
     withFile "test.txt" Read
         (\err => putStrLn $ "Failed to open file in read mode: " ++ show err)
         (\file => testFileReadOps file)
+    withFile "foo" Read
+        (\err => putStrLn $ "Failed to open file in read mode: " ++ show err)
+        (\file => testFileReadOps file)
 
 prog : App Init ()
 prog =

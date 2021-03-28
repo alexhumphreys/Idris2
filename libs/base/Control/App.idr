@@ -372,6 +372,7 @@ data FileEx = GenericFileEx Int -- errno
             | FileNotFound
             | PermissionDenied
             | FileExists
+            | DirectoryIsNotFile
 
 export
 Show FileEx where
@@ -381,6 +382,7 @@ Show FileEx where
   show FileNotFound = "File Not Found"
   show PermissionDenied = "Permission Denied"
   show FileExists = "File Exists"
+  show DirectoryIsNotFile = "Directory Is Not File"
 
 public export
 data IOError

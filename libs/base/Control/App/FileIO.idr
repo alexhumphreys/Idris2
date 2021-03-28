@@ -4,7 +4,7 @@ import Control.App
 
 import Data.List
 import Data.Strings
-import System.File
+import public System.File
 
 toFileEx : FileError -> FileEx
 toFileEx (GenericFileError i) = GenericFileEx i
@@ -13,6 +13,7 @@ toFileEx FileWriteError = FileWriteError
 toFileEx FileNotFound = FileNotFound
 toFileEx PermissionDenied = PermissionDenied
 toFileEx FileExists = FileExists
+toFileEx DirectoryIsNotFile = DirectoryIsNotFile
 
 public export
 interface Has [Exception IOError] e => FileIO e where

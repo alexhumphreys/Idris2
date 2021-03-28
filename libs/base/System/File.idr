@@ -5,6 +5,8 @@ import public Data.Fuel
 import Data.List
 import Data.Strings
 import System.Info
+import public System.FileError
+import System.Directory
 
 %default total
 
@@ -109,14 +111,6 @@ modeStr ReadWrite         = if isWindows then "rb+" else "r+"
 modeStr ReadWriteTruncate = if isWindows then "wb+" else "w+"
 modeStr ReadAppend        = if isWindows then "ab+" else "a+"
 
-public export
-data FileError = GenericFileError Int -- errno
-               | FileReadError
-               | FileWriteError
-               | FileNotFound
-               | PermissionDenied
-               | FileExists
-
 returnError : HasIO io => io (Either FileError a)
 returnError
     = do err <- primIO prim__fileErrno
@@ -127,15 +121,6 @@ returnError
               3 => pure $ Left PermissionDenied
               4 => pure $ Left FileExists
               _ => pure $ Left (GenericFileError (err-5))
-
-export
-Show FileError where
-  show (GenericFileError errno) = "File error: " ++ show errno
-  show FileReadError = "File Read Error"
-  show FileWriteError = "File Write Error"
-  show FileNotFound = "File Not Found"
-  show PermissionDenied = "Permission Denied"
-  show FileExists = "File Exists"
 
 ok : HasIO io => a -> io (Either FileError a)
 ok x = pure (Right x)
@@ -316,11 +301,28 @@ withFile : HasIO io => (filename : String) ->
                        (onOpen  : File -> io (Either a b)) ->
                        io (Either a b)
 withFile filename mode onError onOpen =
-  do Right h <- openFile filename mode
+  do Left _ <- isDir filename | Right _ => Left <$> onError DirectoryIsNotFile
+     Right h <- openFile filename mode
        | Left err => Left <$> onError err
      res <- onOpen h
      closeFile h
      pure res
+  where
+    isDir : String -> io (Either a ())
+    isDir dir = do
+      Right d <- openDir dir
+        | Left err => Left <$> onError err
+      closeDir d
+      pure $ Right ()
+
+    {-
+    isDir : String -> IO Bool
+    isDir dir = do
+      Right d <- openDir dir
+        | Left _ => pure False
+      closeDir d
+      pure True
+      -}
 
 readLinesOnto : HasIO io => (acc : List String) ->
                             (offset : Nat) ->

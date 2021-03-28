@@ -1,6 +1,6 @@
 module System.Directory
 
-import public System.File
+import public System.FileError
 
 public export
 DirPtr : Type

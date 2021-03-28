@@ -82,6 +82,7 @@ modules = Control.App,
           System.Clock,
           System.Directory,
           System.File,
+          System.FileError,
           System.FFI,
           System.Info,
           System.REPL
